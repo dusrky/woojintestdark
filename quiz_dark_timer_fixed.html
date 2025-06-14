@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>문제별 시간 측정 퀴즈 (다크모드)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #2c2c2c;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    .question {
+      margin-bottom: 30px;
+    }
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #ffcc00;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    td {
+      border: 1px solid #999;
+      padding: 8px 12px;
+      text-align: center;
+      width: 50px;
+      color: #fff;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+    input, label {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>⏱ 문제별 시간 측정 퀴즈 (다크모드)</h2>
+    <div class="timer" id="timer">총 경과 시간: 0.00초</div>
+
+    <!-- 문제 1 -->
+    <div class="question" data-answer="3" data-id="q1">
+      <p>① 숫자 찾기 - 숫자 “2”이 몇 번 나오는지 세어서 입력하세요.</p>
+      <table>
+        <tr><td>3</td><td>7</td><td>2</td><td>9</td><td>5</td></tr>
+        <tr><td>8</td><td>4</td><td>7</td><td>1</td><td>6</td></tr>
+        <tr><td>7</td><td>2</td><td>5</td><td>7</td><td>3</td></tr>
+        <tr><td>2</td><td>7</td><td>9</td><td>4</td><td>8</td></tr>
+        <tr><td>1</td><td>3</td><td>7</td><td>6</td><td>5</td></tr>
+      </table>
+      <input type="number" name="q1" onfocus="startQuestion('q1')" onblur="endQuestion('q1')" />
+    </div>
+
+    <!-- 문제 2 -->
+    <div class="question" data-answer="56" data-id="q2">
+      <p>② 구구단 문제 - 7 × 8 = ?</p>
+      <input type="number" name="q2" onfocus="startQuestion('q2')" onblur="endQuestion('q2')" />
+    </div>
+
+    <!-- 문제 3 -->
+    <div class="question" data-answer="1" data-id="q3">
+      <p>③ 단어 기억하기 - "sky"의 뜻은?</p>
+      <label><input type="radio" name="q3" value="1" onfocus="startQuestion('q3')" onclick="endQuestion('q3')"> 하늘</label><br>
+      <label><input type="radio" name="q3" value="2" onfocus="startQuestion('q3')" onclick="endQuestion('q3')"> 바다</label><br>
+      <label><input type="radio" name="q3" value="3" onfocus="startQuestion('q3')" onclick="endQuestion('q3')"> 꿈</label><br>
+      <label><input type="radio" name="q3" value="4" onfocus="startQuestion('q3')" onclick="endQuestion('q3')"> 라면</label>
+    </div>
+
+    <!-- 문제 4 -->
+    <div class="question" data-answer="12" data-id="q4">
+      <p>④ 표에서 가장 작은 값을 입력하세요.</p>
+      <table>
+        <tr><td>12</td><td>28</td><td>17</td><td>23</td></tr>
+        <tr><td>19</td><td>15</td><td>31</td><td>22</td></tr>
+        <tr><td>14</td><td>27</td><td>20</td><td>16</td></tr>
+      </table>
+      <input type="number" name="q4" onfocus="startQuestion('q4')" onblur="endQuestion('q4')" />
+    </div>
+
+    <!-- 피로도 -->
+    <div class="question">
+      <p>😵 눈의 피로도 평가 (1~7점):</p>
+      <input type="number" id="fatigue" min="1" max="7" />
+    </div>
+
+    <button onclick="submitQuiz()">제출하기</button>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const container = document.querySelector(".container");
+      const allQuestions = Array.from(document.querySelectorAll(".question"));
+      const quizQuestions = allQuestions.slice(0, -1);
+      const fatigueQuestion = allQuestions[allQuestions.length - 1];
+
+      for (let i = quizQuestions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizQuestions[i], quizQuestions[j]] = [quizQuestions[j], quizQuestions[i]];
+      }
+
+      quizQuestions.forEach(q => container.insertBefore(q, fatigueQuestion));
+    });
+
+    let startTime = Date.now();
+    let timerInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = ((now - startTime) / 1000).toFixed(2);
+      document.getElementById("timer").textContent = `총 경과 시간: ${elapsed}초`;
+    }, 100);
+
+    const questionTimings = {};
+
+    function startQuestion(qid) {
+      if (!questionTimings[qid]) questionTimings[qid] = {};
+      if (!questionTimings[qid].start) questionTimings[qid].start = Date.now();
+    }
+
+    function endQuestion(qid) {
+      if (!questionTimings[qid]) return;
+      if (!questionTimings[qid].end) {
+        questionTimings[qid].end = Date.now();
+        questionTimings[qid].duration = ((questionTimings[qid].end - questionTimings[qid].start) / 1000).toFixed(2);
+      }
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+      const questions = document.querySelectorAll('.question');
+      let correct = 0;
+
+      questions.forEach(q => {
+        const correctAnswer = q.dataset.answer;
+        const qid = q.dataset.id;
+        if (!correctAnswer || !qid) return;
+
+        let userAnswer = null;
+        const radios = q.querySelectorAll('input[type=radio]');
+        if (radios.length > 0) {
+          radios.forEach(r => {
+            if (r.checked) userAnswer = r.value;
+          });
+        } else {
+          const input = q.querySelector('input[type=number]');
+          if (input) userAnswer = input.value;
+        }
+
+        if (userAnswer == correctAnswer) correct++;
+      });
+
+      const fatigue = document.getElementById("fatigue").value;
+
+      let resultText = `✅ 결과 요약
+- 정답 수: ${correct} / 4
+- 총 시간: ${totalTime}초
+- 피로도: ${fatigue}점
+
+📊 문제별 소요 시간:
+`;
+      for (const [qid, data] of Object.entries(questionTimings)) {
+        resultText += `- ${qid}: ${data.duration || "미기록"}초
+`;
+      }
+
+      alert(resultText);
+    }
+  </script>
+</body>
+</html>
