@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>시인성 퀴즈 실험</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+    }
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: center;
+      width: 50px;
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+    input, button, label {
+      color: #fff;
+      background-color: #2e2e2e;
+      border: 1px solid #555;
+      padding: 6px 10px;
+      margin-top: 6px;
+    }
+    input[type="radio"] {
+      margin-right: 6px;
+    }
+    button {
+      cursor: pointer;
+    }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔍 시인성 실험 퀴즈</h2>
+    <div class="timer" id="timer">⏱ 시간: 0.00초</div>
+
+    <!-- 문제 1 -->
+    <div class="question" data-answer="3">
+      <p>① 숫자 찾기<br>아래 표에서 숫자 “2”이 몇 번 나오는지 세어서 입력하세요.</p>
+      <table>
+        <tr><td>3</td><td>7</td><td>2</td><td>9</td><td>5</td></tr>
+        <tr><td>8</td><td>4</td><td>7</td><td>1</td><td>6</td></tr>
+        <tr><td>7</td><td>2</td><td>5</td><td>7</td><td>3</td></tr>
+        <tr><td>2</td><td>7</td><td>9</td><td>4</td><td>8</td></tr>
+        <tr><td>1</td><td>3</td><td>7</td><td>6</td><td>5</td></tr>
+      </table>
+      <input type="number" name="q1" />
+    </div>
+
+    <!-- 문제 2: 사진 삽입 -->
+    <div class="question" data-answer="3">
+      <p>② 틀린 그림 찾기<br>아래 그림을 보고, 다른 점이 몇 개인지 입력하세요.</p>
+      <img src="https://postfiles.pstatic.net/MjAyMzA0MDVfNDYg/MDAxNjgwNjk4Nzc4NjAy.C9c_fQdo64YFAVV5r4wyzL0yFmgNhs3kgj2DN7wPOdgg.6orZqSZS7aPKMMFlC3-zghTJ7aMW7sLoYtchLNyRzTog.JPEG.wlsrhksgn2759/%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%93%9C3.JPG?type=w3840" alt="틀린그림찾기 이미지">
+      <br><br>
+      <input type="number" name="q2" />
+    </div>
+
+    <!-- 문제 3 -->
+    <div class="question" data-answer="1">
+      <p>③ 단어 기억하기<br>단어: “sky”의 뜻은?</p>
+      <label><input type="radio" name="q3" value="1"> 라면</label><br>
+      <label><input type="radio" name="q3" value="2"> 하늘</label><br>
+      <label><input type="radio" name="q3" value="3"> 바다</label><br>
+      <label><input type="radio" name="q3" value="4"> 꿈</label>
+    </div>
+
+    <!-- 문제 4 -->
+    <div class="question" data-answer="12">
+      <p>④ 표에서 가장 작은 값을을 골라 입력하세요.</p>
+      <table>
+        <tr><td>12</td><td>28</td><td>17</td><td>23</td></tr>
+        <tr><td>19</td><td>15</td><td>31</td><td>22</td></tr>
+        <tr><td>14</td><td>27</td><td>20</td><td>16</td></tr>
+      </table>
+      <input type="number" name="q4" />
+    </div>
+
+    <!-- 피로도 -->
+    <div class="question">
+      <p>😵 눈의 피로도를 평가해주세요 (1=전혀 없음 ~ 7=매우 심함):</p>
+      <input type="number" id="fatigue" min="1" max="7" />
+    </div>
+
+    <button onclick="submitQuiz()">제출하기</button>
+  </div>
+
+  <script>
+    let startTime = Date.now();
+    let timerInterval = setInterval(updateTimer, 100);
+
+    function updateTimer() {
+      const now = Date.now();
+      const elapsed = ((now - startTime) / 1000).toFixed(2);
+      document.getElementById("timer").textContent = `⏱ 시간: ${elapsed}초`;
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+
+      const questions = document.querySelectorAll('.question');
+      let correct = 0;
+
+      questions.forEach((q, index) => {
+        const correctAnswer = q.dataset.answer;
+        if (!correctAnswer) return;
+
+        let userAnswer = null;
+        const radios = q.querySelectorAll('input[type=radio]');
+        if (radios.length > 0) {
+          radios.forEach(r => {
+            if (r.checked) userAnswer = r.value;
+          });
+        } else {
+          const input = q.querySelector('input[type=number]');
+          if (input) userAnswer = input.value;
+        }
+
+        if (userAnswer == correctAnswer) {
+          correct++;
+        }
+      });
+
+      const fatigue = document.getElementById("fatigue").value;
+
+      alert(`✅ 결과 요약\n- 정답 수: ${correct} / 4\n- 시간: ${totalTime}초\n- 피로도: ${fatigue}점`);
+
+      console.log({
+        correct,
+        totalQuestions: 4,
+        time: totalTime,
+        fatigue
+      });
+    }
+  </script>
+</body>
+</html>
